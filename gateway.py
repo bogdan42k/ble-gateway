@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""BLE Gateway for Govee and ThermoPro sensors - publishes sensor data to MQTT."""
+"""BLE Gateway for Govee, ThermoPro, and Inkbird sensors - publishes sensor data to MQTT."""
 
 import asyncio
 import logging
@@ -14,6 +14,7 @@ from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
 from govee_ble import GoveeBluetoothDeviceData
 from thermopro_ble import ThermoProBluetoothDeviceData
+from inkbird_ble import INKBIRDBluetoothDeviceData
 from home_assistant_bluetooth import BluetoothServiceInfoBleak
 from sensor_state_data import SensorDeviceClass
 
@@ -31,6 +32,7 @@ class BLEGateway:
         self.mqtt_client: mqtt.Client | None = None
         self.govee_parsers: dict[str, GoveeBluetoothDeviceData] = {}
         self.thermopro_parsers: dict[str, ThermoProBluetoothDeviceData] = {}
+        self.inkbird_parsers: dict[str, INKBIRDBluetoothDeviceData] = {}
         self.running = False
 
     def setup_mqtt(self) -> mqtt.Client:
@@ -71,6 +73,12 @@ class BLEGateway:
         if address not in self.thermopro_parsers:
             self.thermopro_parsers[address] = ThermoProBluetoothDeviceData()
         return self.thermopro_parsers[address]
+
+    def get_inkbird_parser(self, address: str) -> INKBIRDBluetoothDeviceData:
+        """Get or create an Inkbird parser for a device."""
+        if address not in self.inkbird_parsers:
+            self.inkbird_parsers[address] = INKBIRDBluetoothDeviceData()
+        return self.inkbird_parsers[address]
 
     def publish_sensor_data(self, address: str, sensor_type: str, value: float):
         """Publish sensor data to MQTT."""
@@ -140,14 +148,20 @@ class BLEGateway:
         # Try ThermoPro parser
         thermopro_parser = self.get_thermopro_parser(device.address)
         thermopro_update = thermopro_parser.update(service_info)
-        self.process_sensor_update(device, thermopro_update)
+        if self.process_sensor_update(device, thermopro_update):
+            return
+
+        # Try Inkbird parser
+        inkbird_parser = self.get_inkbird_parser(device.address)
+        inkbird_update = inkbird_parser.update(service_info)
+        self.process_sensor_update(device, inkbird_update)
 
     async def run(self):
         """Run the BLE scanner."""
         self.mqtt_client = self.setup_mqtt()
         self.running = True
 
-        logger.info("Starting BLE scanner for Govee and ThermoPro devices...")
+        logger.info("Starting BLE scanner for Govee, ThermoPro, and Inkbird devices...")
 
         async with BleakScanner(detection_callback=self.detection_callback):
             while self.running:

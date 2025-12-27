@@ -1,6 +1,6 @@
 # BLE Gateway
 
-A Python BLE gateway that listens for Govee and ThermoPro sensor advertisements and publishes sensor data to an MQTT broker.
+A Python BLE gateway that listens for Govee, ThermoPro, and Inkbird sensor advertisements and publishes sensor data to an MQTT broker.
 
 ## Supported Devices
 
@@ -9,12 +9,16 @@ A Python BLE gateway that listens for Govee and ThermoPro sensor advertisements 
 - And other Govee thermometer/hygrometer models supported by [govee-ble](https://github.com/Bluetooth-Devices/govee-ble)
 
 ### ThermoPro
-- ThermoPro TP357, TP358, TP359
+- ThermoPro TP351, TP357, TP358, TP359
 - And other ThermoPro models supported by [thermopro-ble](https://github.com/Bluetooth-Devices/thermopro-ble)
+
+### Inkbird
+- Inkbird IBS-TH1, IBS-TH2, ITH-12S
+- And other Inkbird models supported by [inkbird-ble](https://github.com/Bluetooth-Devices/inkbird-ble)
 
 ## Features
 
-- Passive BLE scanning for Govee and ThermoPro device advertisements
+- Passive BLE scanning for Govee, ThermoPro, and Inkbird device advertisements
 - Parses temperature, humidity, and battery level
 - Publishes to MQTT with TLS support
 - Runs as CLI, systemd service, or Docker container
@@ -197,6 +201,7 @@ Messages are published with the `retain` flag set.
 
 - [govee-ble](https://github.com/Bluetooth-Devices/govee-ble) - Govee BLE advertisement parser
 - [thermopro-ble](https://github.com/Bluetooth-Devices/thermopro-ble) - ThermoPro BLE advertisement parser
+- [inkbird-ble](https://github.com/Bluetooth-Devices/inkbird-ble) - Inkbird BLE advertisement parser
 - [bleak](https://github.com/hbldh/bleak) - Bluetooth Low Energy platform-agnostic client
 - [paho-mqtt](https://github.com/eclipse/paho.mqtt.python) - MQTT client library
 
