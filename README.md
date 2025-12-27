@@ -179,12 +179,21 @@ docker compose logs -f
 Data is published to the following topics:
 
 ```
-sensors/{device_mac}/temperature  - Temperature in Celsius (e.g., "23.5")
-sensors/{device_mac}/humidity     - Relative humidity percentage (e.g., "49.9")
-sensors/{device_mac}/battery      - Battery percentage (e.g., "92")
+sensors/{brand}/{device_mac}/temperature  - Temperature in Celsius (e.g., "23.5")
+sensors/{brand}/{device_mac}/humidity     - Relative humidity percentage (e.g., "49.9")
+sensors/{brand}/{device_mac}/battery      - Battery percentage (e.g., "92")
 ```
 
-MAC addresses are lowercase with colons (e.g., `a4:c1:38:xx:xx:xx`).
+Brands: `govee`, `thermopro`, `inkbird`
+
+Examples:
+```
+sensors/govee/a4:c1:38:xx:xx:xx/temperature
+sensors/thermopro/c9:5f:6b:xx:xx:xx/humidity
+sensors/inkbird/4c:c3:a3:xx:xx:xx/battery
+```
+
+MAC addresses are lowercase with colons.
 
 Messages are published with the `retain` flag set.
 

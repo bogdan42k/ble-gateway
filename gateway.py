@@ -80,10 +80,10 @@ class BLEGateway:
             self.inkbird_parsers[address] = INKBIRDBluetoothDeviceData()
         return self.inkbird_parsers[address]
 
-    def publish_sensor_data(self, address: str, sensor_type: str, value: float):
+    def publish_sensor_data(self, address: str, brand: str, sensor_type: str, value: float):
         """Publish sensor data to MQTT."""
         mac = address.lower().replace("-", ":")
-        topic = f"{config.MQTT_TOPIC_PREFIX}/{mac}/{sensor_type}"
+        topic = f"{config.MQTT_TOPIC_PREFIX}/{brand}/{mac}/{sensor_type}"
         payload = str(round(value, 1) if sensor_type != "battery" else int(value))
 
         result = self.mqtt_client.publish(topic, payload, retain=True)
@@ -92,12 +92,12 @@ class BLEGateway:
         else:
             logger.error(f"Failed to publish to {topic}: {result.rc}")
 
-    def process_sensor_update(self, device: BLEDevice, update):
+    def process_sensor_update(self, device: BLEDevice, update, brand: str):
         """Process sensor update and publish to MQTT."""
         if not update.entity_values:
             return False
 
-        logger.info(f"Device: {device.address} ({device.name or 'Unknown'})")
+        logger.info(f"Device: {device.address} ({device.name or 'Unknown'}) [{brand}]")
 
         for device_key, sensor_value in update.entity_values.items():
             description = update.entity_descriptions.get(device_key)
@@ -107,15 +107,15 @@ class BLEGateway:
             device_class = description.device_class
 
             if device_class == SensorDeviceClass.TEMPERATURE:
-                self.publish_sensor_data(device.address, "temperature", sensor_value.native_value)
+                self.publish_sensor_data(device.address, brand, "temperature", sensor_value.native_value)
                 logger.info(f"  Temperature: {sensor_value.native_value}°C")
 
             elif device_class == SensorDeviceClass.HUMIDITY:
-                self.publish_sensor_data(device.address, "humidity", sensor_value.native_value)
+                self.publish_sensor_data(device.address, brand, "humidity", sensor_value.native_value)
                 logger.info(f"  Humidity: {sensor_value.native_value}%")
 
             elif device_class == SensorDeviceClass.BATTERY:
-                self.publish_sensor_data(device.address, "battery", sensor_value.native_value)
+                self.publish_sensor_data(device.address, brand, "battery", sensor_value.native_value)
                 logger.info(f"  Battery: {sensor_value.native_value}%")
 
         return True
@@ -142,19 +142,19 @@ class BLEGateway:
         # Try Govee parser
         govee_parser = self.get_govee_parser(device.address)
         govee_update = govee_parser.update(service_info)
-        if self.process_sensor_update(device, govee_update):
+        if self.process_sensor_update(device, govee_update, "govee"):
             return
 
         # Try ThermoPro parser
         thermopro_parser = self.get_thermopro_parser(device.address)
         thermopro_update = thermopro_parser.update(service_info)
-        if self.process_sensor_update(device, thermopro_update):
+        if self.process_sensor_update(device, thermopro_update, "thermopro"):
             return
 
         # Try Inkbird parser
         inkbird_parser = self.get_inkbird_parser(device.address)
         inkbird_update = inkbird_parser.update(service_info)
-        self.process_sensor_update(device, inkbird_update)
+        self.process_sensor_update(device, inkbird_update, "inkbird")
 
     async def run(self):
         """Run the BLE scanner."""
