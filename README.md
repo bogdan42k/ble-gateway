@@ -122,7 +122,7 @@ Configuration is done via environment variables:
 | `MQTT_USERNAME` | - | MQTT username |
 | `MQTT_PASSWORD` | - | MQTT password |
 | `MQTT_USE_TLS` | `true` | Enable TLS encryption |
-| `MQTT_TOPIC_PREFIX` | `govee` | MQTT topic prefix |
+| `MQTT_TOPIC_PREFIX` | `sensors` | MQTT topic prefix |
 | `LOG_LEVEL` | `INFO` | Logging level (DEBUG, INFO, WARNING, ERROR) |
 
 Edit `config.py` to change default values, or set environment variables.
@@ -175,9 +175,9 @@ docker compose logs -f
 Data is published to the following topics:
 
 ```
-govee/{device_mac}/temperature  - Temperature in Celsius (e.g., "23.5")
-govee/{device_mac}/humidity     - Relative humidity percentage (e.g., "49.9")
-govee/{device_mac}/battery      - Battery percentage (e.g., "92")
+sensors/{device_mac}/temperature  - Temperature in Celsius (e.g., "23.5")
+sensors/{device_mac}/humidity     - Relative humidity percentage (e.g., "49.9")
+sensors/{device_mac}/battery      - Battery percentage (e.g., "92")
 ```
 
 MAC addresses are lowercase with colons (e.g., `a4:c1:38:xx:xx:xx`).
