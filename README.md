@@ -1,19 +1,20 @@
-# Govee BLE Gateway
+# BLE Gateway
 
-A Python BLE gateway that listens for Govee hygrometer advertisements and publishes sensor data to an MQTT broker.
+A Python BLE gateway that listens for Govee and ThermoPro sensor advertisements and publishes sensor data to an MQTT broker.
 
 ## Supported Devices
 
-- Govee H5074
-- Govee H5075
-- Govee H5100
-- Govee H5177
-- Govee H5179
+### Govee
+- Govee H5074, H5075, H5100, H5177, H5179
 - And other Govee thermometer/hygrometer models supported by [govee-ble](https://github.com/Bluetooth-Devices/govee-ble)
+
+### ThermoPro
+- ThermoPro TP357, TP358, TP359
+- And other ThermoPro models supported by [thermopro-ble](https://github.com/Bluetooth-Devices/thermopro-ble)
 
 ## Features
 
-- Passive BLE scanning for Govee device advertisements
+- Passive BLE scanning for Govee and ThermoPro device advertisements
 - Parses temperature, humidity, and battery level
 - Publishes to MQTT with TLS support
 - Runs as CLI, systemd service, or Docker container
@@ -195,6 +196,7 @@ Messages are published with the `retain` flag set.
 ## Dependencies
 
 - [govee-ble](https://github.com/Bluetooth-Devices/govee-ble) - Govee BLE advertisement parser
+- [thermopro-ble](https://github.com/Bluetooth-Devices/thermopro-ble) - ThermoPro BLE advertisement parser
 - [bleak](https://github.com/hbldh/bleak) - Bluetooth Low Energy platform-agnostic client
 - [paho-mqtt](https://github.com/eclipse/paho.mqtt.python) - MQTT client library
 
