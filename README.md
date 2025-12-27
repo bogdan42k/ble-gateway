@@ -18,6 +18,82 @@ A Python BLE gateway that listens for Govee hygrometer advertisements and publis
 - Publishes to MQTT with TLS support
 - Runs as CLI, systemd service, or Docker container
 
+## Raspberry Pi Setup
+
+This gateway runs well on Raspberry Pi, making it ideal for a dedicated BLE-to-MQTT bridge.
+
+### Prerequisites
+
+- Raspberry Pi 3/4/5/Zero W (with built-in Bluetooth)
+- Raspberry Pi OS Bullseye or newer
+- Python 3.10+
+
+### Quick Start
+
+```bash
+# Install system dependencies
+sudo apt update
+sudo apt install -y python3-venv python3-pip bluetooth bluez
+
+# Clone the repository
+git clone https://github.com/bogdan42k/ble-gateway.git
+cd ble-gateway
+
+# Create virtual environment and install dependencies
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Configure and run
+export MQTT_BROKER=your-broker.example.com
+export MQTT_USERNAME=your_username
+export MQTT_PASSWORD=your_password
+python gateway.py
+```
+
+### Run as Service (Auto-start on Boot)
+
+```bash
+# Copy files
+sudo mkdir -p /opt/govee-gateway
+sudo cp gateway.py config.py requirements.txt /opt/govee-gateway/
+sudo python3 -m venv /opt/govee-gateway/venv
+sudo /opt/govee-gateway/venv/bin/pip install -r /opt/govee-gateway/requirements.txt
+
+# Create environment file with your credentials
+sudo tee /opt/govee-gateway/.env << EOF
+MQTT_BROKER=your-broker.example.com
+MQTT_USERNAME=your_username
+MQTT_PASSWORD=your_password
+EOF
+sudo chmod 600 /opt/govee-gateway/.env
+
+# Install and start service
+sudo cp govee-gateway.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now govee-gateway
+
+# Check status
+sudo systemctl status govee-gateway
+sudo journalctl -u govee-gateway -f
+```
+
+### Troubleshooting
+
+**Bluetooth permission errors:**
+```bash
+# Add user to bluetooth group
+sudo usermod -aG bluetooth $USER
+# Reboot or re-login
+```
+
+**No devices found:**
+```bash
+# Check Bluetooth is enabled
+sudo systemctl status bluetooth
+sudo hciconfig hci0 up
+```
+
 ## Installation
 
 ### Using pip
