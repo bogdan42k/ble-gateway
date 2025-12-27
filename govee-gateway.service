@@ -1,0 +1,22 @@
+[Unit]
+Description=Govee BLE Gateway
+After=network.target bluetooth.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/govee-gateway/gateway.py
+WorkingDirectory=/opt/govee-gateway
+Restart=always
+RestartSec=10
+
+# Bluetooth access
+CapabilityBoundingSet=CAP_NET_RAW CAP_NET_ADMIN
+AmbientCapabilities=CAP_NET_RAW CAP_NET_ADMIN
+
+# Environment (optional overrides)
+# Environment=MQTT_BROKER=mqtt.growanna.com
+# Environment=MQTT_PORT=8883
+# Environment=LOG_LEVEL=INFO
+
+[Install]
+WantedBy=multi-user.target

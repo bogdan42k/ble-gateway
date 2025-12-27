@@ -1,0 +1,13 @@
+[project]
+name = "govee-ble-gateway"
+version = "1.0.0"
+description = "BLE gateway for Govee hygrometers with MQTT publishing"
+requires-python = ">=3.10"
+dependencies = [
+    "govee-ble>=1.0.0",
+    "bleak>=0.21.0",
+    "paho-mqtt>=2.0.0",
+]
+
+[project.scripts]
+govee-gateway = "gateway:main"

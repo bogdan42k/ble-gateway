@@ -1,0 +1,15 @@
+services:
+  govee-gateway:
+    build: .
+    container_name: govee-gateway
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    volumes:
+      - /var/run/dbus:/var/run/dbus:ro
+    environment:
+      - MQTT_BROKER=${MQTT_BROKER:-mqtt.example.com}
+      - MQTT_PORT=${MQTT_PORT:-8883}
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
