@@ -187,7 +187,7 @@ install_service() {
 
     cat > /etc/systemd/system/${SERVICE_NAME}.service << EOF
 [Unit]
-Description=BLE Gateway for Govee, ThermoPro, Inkbird, and SensorPush sensors
+Description=BLE Gateway for Govee, ThermoPro, Inkbird, SensorPush, and Ruuvi sensors
 After=network.target bluetooth.target
 
 [Service]

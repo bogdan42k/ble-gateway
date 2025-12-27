@@ -1,6 +1,6 @@
 # BLE Gateway
 
-A Python BLE gateway that listens for Govee, ThermoPro, Inkbird, and SensorPush sensor advertisements and publishes sensor data to an MQTT broker.
+A Python BLE gateway that listens for Govee, ThermoPro, Inkbird, SensorPush, and Ruuvi sensor advertisements and publishes sensor data to an MQTT broker.
 
 ## Supported Devices
 
@@ -20,10 +20,14 @@ A Python BLE gateway that listens for Govee, ThermoPro, Inkbird, and SensorPush 
 - SensorPush HT1, HT.w, HTP.xw
 - And other SensorPush models supported by [sensorpush-ble](https://github.com/Bluetooth-Devices/sensorpush-ble)
 
+### Ruuvi
+- RuuviTag, RuuviTag Pro
+- And other Ruuvi models supported by [ruuvitag-ble](https://github.com/Bluetooth-Devices/ruuvitag-ble)
+
 ## Features
 
-- Passive BLE scanning for Govee, ThermoPro, Inkbird, and SensorPush device advertisements
-- Parses temperature, humidity, and battery level
+- Passive BLE scanning for Govee, ThermoPro, Inkbird, SensorPush, and Ruuvi device advertisements
+- Parses temperature, humidity, battery level, pressure, and voltage
 - Publishes to MQTT with TLS support
 - Runs as CLI, systemd service, or Docker container
 
@@ -207,9 +211,11 @@ Data is published to the following topics:
 sensors/{brand}/{device_mac}/temperature  - Temperature in Celsius (e.g., "23.5")
 sensors/{brand}/{device_mac}/humidity     - Relative humidity percentage (e.g., "49.9")
 sensors/{brand}/{device_mac}/battery      - Battery percentage (e.g., "92")
+sensors/{brand}/{device_mac}/pressure     - Atmospheric pressure in hPa (e.g., "1013.2")
+sensors/{brand}/{device_mac}/voltage      - Battery voltage in V (e.g., "2.9")
 ```
 
-Brands: `govee`, `thermopro`, `inkbird`, `sensorpush`
+Brands: `govee`, `thermopro`, `inkbird`, `sensorpush`, `ruuvi`
 
 Examples:
 ```
@@ -217,6 +223,7 @@ sensors/govee/a4:c1:38:xx:xx:xx/temperature
 sensors/thermopro/c9:5f:6b:xx:xx:xx/humidity
 sensors/inkbird/4c:c3:a3:xx:xx:xx/battery
 sensors/sensorpush/a1:b2:c3:xx:xx:xx/temperature
+sensors/ruuvi/d4:e5:f6:xx:xx:xx/pressure
 ```
 
 MAC addresses are lowercase with colons.
@@ -238,6 +245,7 @@ Messages are published with the `retain` flag set.
 - [thermopro-ble](https://github.com/Bluetooth-Devices/thermopro-ble) - ThermoPro BLE advertisement parser
 - [inkbird-ble](https://github.com/Bluetooth-Devices/inkbird-ble) - Inkbird BLE advertisement parser
 - [sensorpush-ble](https://github.com/Bluetooth-Devices/sensorpush-ble) - SensorPush BLE advertisement parser
+- [ruuvitag-ble](https://github.com/Bluetooth-Devices/ruuvitag-ble) - RuuviTag BLE advertisement parser
 - [bleak](https://github.com/hbldh/bleak) - Bluetooth Low Energy platform-agnostic client
 - [paho-mqtt](https://github.com/eclipse/paho.mqtt.python) - MQTT client library
 

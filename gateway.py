@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""BLE Gateway for Govee, ThermoPro, Inkbird, and SensorPush sensors - publishes sensor data to MQTT."""
+"""BLE Gateway for Govee, ThermoPro, Inkbird, SensorPush, and Ruuvi sensors - publishes sensor data to MQTT."""
 
 import asyncio
 import logging
@@ -16,6 +16,7 @@ from govee_ble import GoveeBluetoothDeviceData
 from thermopro_ble import ThermoProBluetoothDeviceData
 from inkbird_ble import INKBIRDBluetoothDeviceData
 from sensorpush_ble import SensorPushBluetoothDeviceData
+from ruuvitag_ble import RuuvitagBluetoothDeviceData
 from home_assistant_bluetooth import BluetoothServiceInfoBleak
 from sensor_state_data import SensorDeviceClass
 
@@ -35,6 +36,7 @@ class BLEGateway:
         self.thermopro_parsers: dict[str, ThermoProBluetoothDeviceData] = {}
         self.inkbird_parsers: dict[str, INKBIRDBluetoothDeviceData] = {}
         self.sensorpush_parsers: dict[str, SensorPushBluetoothDeviceData] = {}
+        self.ruuvi_parsers: dict[str, RuuvitagBluetoothDeviceData] = {}
         self.running = False
 
     def setup_mqtt(self) -> mqtt.Client:
@@ -88,6 +90,12 @@ class BLEGateway:
             self.sensorpush_parsers[address] = SensorPushBluetoothDeviceData()
         return self.sensorpush_parsers[address]
 
+    def get_ruuvi_parser(self, address: str) -> RuuvitagBluetoothDeviceData:
+        """Get or create a Ruuvi parser for a device."""
+        if address not in self.ruuvi_parsers:
+            self.ruuvi_parsers[address] = RuuvitagBluetoothDeviceData()
+        return self.ruuvi_parsers[address]
+
     def publish_sensor_data(self, address: str, brand: str, sensor_type: str, value: float):
         """Publish sensor data to MQTT."""
         mac = address.lower().replace("-", ":")
@@ -125,6 +133,16 @@ class BLEGateway:
             elif device_class == SensorDeviceClass.BATTERY:
                 self.publish_sensor_data(device.address, brand, "battery", sensor_value.native_value)
                 logger.info(f"  Battery: {sensor_value.native_value}%")
+
+            elif device_class == SensorDeviceClass.PRESSURE:
+                self.publish_sensor_data(device.address, brand, "pressure", sensor_value.native_value)
+                logger.info(f"  Pressure: {sensor_value.native_value} hPa")
+
+            elif device_class == SensorDeviceClass.VOLTAGE:
+                # Ruuvi reports voltage in millivolts, convert to volts
+                voltage_v = sensor_value.native_value / 1000 if sensor_value.native_value > 100 else sensor_value.native_value
+                self.publish_sensor_data(device.address, brand, "voltage", voltage_v)
+                logger.info(f"  Voltage: {voltage_v}V")
 
         return True
 
@@ -168,14 +186,20 @@ class BLEGateway:
         # Try SensorPush parser
         sensorpush_parser = self.get_sensorpush_parser(device.address)
         sensorpush_update = sensorpush_parser.update(service_info)
-        self.process_sensor_update(device, sensorpush_update, "sensorpush")
+        if self.process_sensor_update(device, sensorpush_update, "sensorpush"):
+            return
+
+        # Try Ruuvi parser
+        ruuvi_parser = self.get_ruuvi_parser(device.address)
+        ruuvi_update = ruuvi_parser.update(service_info)
+        self.process_sensor_update(device, ruuvi_update, "ruuvi")
 
     async def run(self):
         """Run the BLE scanner."""
         self.mqtt_client = self.setup_mqtt()
         self.running = True
 
-        logger.info("Starting BLE scanner for Govee, ThermoPro, Inkbird, and SensorPush devices...")
+        logger.info("Starting BLE scanner for Govee, ThermoPro, Inkbird, SensorPush, and Ruuvi devices...")
 
         async with BleakScanner(detection_callback=self.detection_callback):
             while self.running:
