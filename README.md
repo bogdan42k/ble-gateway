@@ -31,13 +31,34 @@ A Python BLE gateway that listens for Govee, ThermoPro, Inkbird, and SensorPush 
 
 This gateway runs well on Raspberry Pi, making it ideal for a dedicated BLE-to-MQTT bridge.
 
-### Prerequisites
+### Easy Install (Recommended)
+
+Run this single command on your Raspberry Pi:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/bogdan42k/ble-gateway/main/install.sh | sudo bash
+```
+
+The installer will:
+- Install all dependencies
+- Prompt you for MQTT configuration
+- Set up auto-start on boot
+- Start the service immediately
+
+To uninstall:
+```bash
+curl -sSL https://raw.githubusercontent.com/bogdan42k/ble-gateway/main/install.sh | sudo bash -s -- --uninstall
+```
+
+### Manual Install
+
+#### Prerequisites
 
 - Raspberry Pi 3/4/5/Zero W (with built-in Bluetooth)
 - Raspberry Pi OS Bullseye or newer
 - Python 3.10+
 
-### Quick Start
+#### Quick Start
 
 ```bash
 # Install system dependencies
