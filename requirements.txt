@@ -1,5 +1,6 @@
 govee-ble>=1.0.0
 thermopro-ble>=1.0.0
 inkbird-ble>=1.0.0
+sensorpush-ble>=1.0.0
 bleak>=0.21.0
 paho-mqtt>=2.0.0
