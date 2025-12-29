@@ -53,7 +53,7 @@ check_root() {
 
 check_raspberry_pi() {
     if [ -f /proc/device-tree/model ]; then
-        MODEL=$(cat /proc/device-tree/model)
+        MODEL=$(tr -d '\0' < /proc/device-tree/model)
         if [[ "$MODEL" == *"Raspberry Pi"* ]]; then
             print_success "Raspberry Pi detected: $MODEL"
             return 0
