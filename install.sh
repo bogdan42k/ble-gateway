@@ -94,7 +94,7 @@ install_dependencies() {
     echo ""
     print_info "Installing system dependencies..."
     apt-get update -qq
-    apt-get install -y -qq python3-venv python3-pip python3-dev build-essential libffi-dev bluetooth bluez git > /dev/null
+    apt-get install -y -qq python3-venv python3-pip python3-dev build-essential libffi-dev libssl-dev bluetooth bluez git > /dev/null
     print_success "System packages installed"
 }
 
