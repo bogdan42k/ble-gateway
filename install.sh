@@ -121,9 +121,16 @@ setup_python() {
     python3 -m venv venv
     print_success "Virtual environment created"
 
+    # Use disk instead of tmpfs for builds (Pi has small /tmp)
+    mkdir -p "$INSTALL_DIR/.pip-tmp"
+    export TMPDIR="$INSTALL_DIR/.pip-tmp"
+
     ./venv/bin/pip install -q --upgrade pip
     ./venv/bin/pip install -q -r requirements.txt
     print_success "Dependencies installed"
+
+    # Cleanup build temp
+    rm -rf "$INSTALL_DIR/.pip-tmp"
 }
 
 configure_mqtt() {
