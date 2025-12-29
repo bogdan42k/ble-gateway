@@ -134,7 +134,7 @@ configure_mqtt() {
     # Check for existing config
     if [ -f "$INSTALL_DIR/.env" ]; then
         print_warning "Existing configuration found"
-        read -p "  Reconfigure? [y/N]: " RECONFIG
+        read -p "  Reconfigure? [y/N]: " RECONFIG < /dev/tty
         if [[ ! "$RECONFIG" =~ ^[Yy]$ ]]; then
             print_info "Keeping existing configuration"
             return 0
@@ -142,25 +142,25 @@ configure_mqtt() {
     fi
 
     # MQTT Broker
-    read -p "  MQTT Broker address: " MQTT_BROKER
+    read -p "  MQTT Broker address: " MQTT_BROKER < /dev/tty
     if [ -z "$MQTT_BROKER" ]; then
         print_error "MQTT Broker is required"
         exit 1
     fi
 
     # MQTT Port
-    read -p "  MQTT Port [8883]: " MQTT_PORT
+    read -p "  MQTT Port [8883]: " MQTT_PORT < /dev/tty
     MQTT_PORT=${MQTT_PORT:-8883}
 
     # MQTT Username
-    read -p "  MQTT Username: " MQTT_USERNAME
+    read -p "  MQTT Username: " MQTT_USERNAME < /dev/tty
 
     # MQTT Password
-    read -s -p "  MQTT Password: " MQTT_PASSWORD
+    read -s -p "  MQTT Password: " MQTT_PASSWORD < /dev/tty
     echo ""
 
     # TLS
-    read -p "  Use TLS encryption? [Y/n]: " USE_TLS
+    read -p "  Use TLS encryption? [Y/n]: " USE_TLS < /dev/tty
     if [[ "$USE_TLS" =~ ^[Nn]$ ]]; then
         MQTT_USE_TLS="false"
     else
