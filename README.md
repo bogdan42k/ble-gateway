@@ -89,27 +89,27 @@ python gateway.py
 
 ```bash
 # Copy files
-sudo mkdir -p /opt/govee-gateway
-sudo cp gateway.py config.py requirements.txt /opt/govee-gateway/
-sudo python3 -m venv /opt/govee-gateway/venv
-sudo /opt/govee-gateway/venv/bin/pip install -r /opt/govee-gateway/requirements.txt
+sudo mkdir -p /opt/ble-gateway
+sudo cp gateway.py config.py requirements.txt /opt/ble-gateway/
+sudo python3 -m venv /opt/ble-gateway/venv
+sudo /opt/ble-gateway/venv/bin/pip install -r /opt/ble-gateway/requirements.txt
 
 # Create environment file with your credentials
-sudo tee /opt/govee-gateway/.env << EOF
+sudo tee /opt/ble-gateway/.env << EOF
 MQTT_BROKER=your-broker.example.com
 MQTT_USERNAME=your_username
 MQTT_PASSWORD=your_password
 EOF
-sudo chmod 600 /opt/govee-gateway/.env
+sudo chmod 600 /opt/ble-gateway/.env
 
 # Install and start service
-sudo cp govee-gateway.service /etc/systemd/system/
+sudo cp ble-gateway.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now govee-gateway
+sudo systemctl enable --now ble-gateway
 
 # Check status
-sudo systemctl status govee-gateway
-sudo journalctl -u govee-gateway -f
+sudo systemctl status ble-gateway
+sudo journalctl -u ble-gateway -f
 ```
 
 ### Troubleshooting
@@ -171,25 +171,25 @@ python gateway.py
 
 ### Run as systemd service
 
-1. Copy files to `/opt/govee-gateway`:
+1. Copy files to `/opt/ble-gateway`:
    ```bash
-   sudo mkdir -p /opt/govee-gateway
-   sudo cp gateway.py config.py requirements.txt /opt/govee-gateway/
-   sudo python3 -m venv /opt/govee-gateway/venv
-   sudo /opt/govee-gateway/venv/bin/pip install -r /opt/govee-gateway/requirements.txt
+   sudo mkdir -p /opt/ble-gateway
+   sudo cp gateway.py config.py requirements.txt /opt/ble-gateway/
+   sudo python3 -m venv /opt/ble-gateway/venv
+   sudo /opt/ble-gateway/venv/bin/pip install -r /opt/ble-gateway/requirements.txt
    ```
 
 2. Install and enable service:
    ```bash
-   sudo cp govee-gateway.service /etc/systemd/system/
+   sudo cp ble-gateway.service /etc/systemd/system/
    sudo systemctl daemon-reload
-   sudo systemctl enable --now govee-gateway
+   sudo systemctl enable --now ble-gateway
    ```
 
 3. Check status:
    ```bash
-   sudo systemctl status govee-gateway
-   sudo journalctl -u govee-gateway -f
+   sudo systemctl status ble-gateway
+   sudo journalctl -u ble-gateway -f
    ```
 
 ### Run with Docker
@@ -233,10 +233,10 @@ Messages are published with the `retain` flag set.
 ## Example Output
 
 ```
-2024-12-27 15:28:42 - govee-gateway - INFO - Device: 535C2D47-BF8F-7D78-BF11-C9F2602F4BE4 (Govee_H5074_38A8)
-2024-12-27 15:28:42 - govee-gateway - INFO -   Temperature: 23.0°C
-2024-12-27 15:28:42 - govee-gateway - INFO -   Humidity: 49.9%
-2024-12-27 15:28:42 - govee-gateway - INFO -   Battery: 92%
+2024-12-27 15:28:42 - ble-gateway - INFO - Device: 535C2D47-BF8F-7D78-BF11-C9F2602F4BE4 (Govee_H5074_38A8)
+2024-12-27 15:28:42 - ble-gateway - INFO -   Temperature: 23.0°C
+2024-12-27 15:28:42 - ble-gateway - INFO -   Humidity: 49.9%
+2024-12-27 15:28:42 - ble-gateway - INFO -   Battery: 92%
 ```
 
 ## Dependencies

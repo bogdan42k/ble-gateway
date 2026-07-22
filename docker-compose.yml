@@ -1,7 +1,7 @@
 services:
-  govee-gateway:
+  ble-gateway:
     build: .
-    container_name: govee-gateway
+    container_name: ble-gateway
     restart: unless-stopped
     network_mode: host
     privileged: true

@@ -1,16 +1,16 @@
 [Unit]
-Description=Govee BLE Gateway
+Description=BLE Gateway for Govee, ThermoPro, Inkbird, SensorPush, and Ruuvi sensors
 After=network.target bluetooth.target
 
 [Service]
 Type=simple
-ExecStart=/opt/govee-gateway/venv/bin/python /opt/govee-gateway/gateway.py
-WorkingDirectory=/opt/govee-gateway
+ExecStart=/opt/ble-gateway/venv/bin/python /opt/ble-gateway/gateway.py
+WorkingDirectory=/opt/ble-gateway
 Restart=always
 RestartSec=10
 
 # Load environment variables from file
-EnvironmentFile=-/opt/govee-gateway/.env
+EnvironmentFile=-/opt/ble-gateway/.env
 
 # Bluetooth access
 CapabilityBoundingSet=CAP_NET_RAW CAP_NET_ADMIN
