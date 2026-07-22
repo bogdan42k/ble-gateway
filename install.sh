@@ -94,7 +94,7 @@ install_dependencies() {
     echo ""
     print_info "Installing system dependencies..."
     apt-get update -qq
-    apt-get install -y -qq python3-venv python3-pip python3-dev build-essential libffi-dev libssl-dev bluetooth bluez git > /dev/null
+    apt-get install -y -qq python3-venv python3-pip python3-dev python3-cryptography python3-cffi build-essential libffi-dev libssl-dev bluetooth bluez git > /dev/null
     print_success "System packages installed"
 }
 
@@ -118,15 +118,25 @@ setup_python() {
     print_info "Setting up Python environment..."
 
     cd "$INSTALL_DIR"
-    python3 -m venv venv
+    # Recreate the venv cleanly, and use --system-site-packages so it can reuse
+    # the apt-installed binary packages (python3-cryptography, python3-cffi).
+    # This avoids compiling cryptography's Rust core from source, which is the
+    # single biggest cause of multi-hour (or failed) installs on a Pi Zero's
+    # single-core ARMv6 CPU.
+    rm -rf venv
+    python3 -m venv --system-site-packages venv
     print_success "Virtual environment created"
 
     # Use disk instead of tmpfs for builds (Pi has small /tmp)
     mkdir -p "$INSTALL_DIR/.pip-tmp"
     export TMPDIR="$INSTALL_DIR/.pip-tmp"
 
+    # Prefer prebuilt ARM wheels from piwheels over compiling from source.
+    export PIP_EXTRA_INDEX_URL="https://www.piwheels.org/simple"
+    export PIP_PREFER_BINARY=1
+
     ./venv/bin/pip install -q --upgrade pip
-    ./venv/bin/pip install -q -r requirements.txt
+    ./venv/bin/pip install -q --prefer-binary -r requirements.txt
     print_success "Dependencies installed"
 
     # Cleanup build temp
