@@ -245,10 +245,12 @@ start_service() {
 }
 
 show_success() {
+    LOCAL_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
     echo ""
     echo -e "${GREEN}════════════════════════════════════════════════${NC}"
     echo -e "${GREEN}  ✓ BLE Gateway is now running!${NC}"
     echo ""
+    echo "  Web UI:        http://${LOCAL_IP:-<pi-ip>}:8080"
     echo "  View logs:     sudo journalctl -u ${SERVICE_NAME} -f"
     echo "  Stop service:  sudo systemctl stop ${SERVICE_NAME}"
     echo "  Restart:       sudo systemctl restart ${SERVICE_NAME}"

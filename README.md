@@ -29,6 +29,7 @@ A Python BLE gateway that listens for Govee, ThermoPro, Inkbird, SensorPush, and
 - Passive BLE scanning for Govee, ThermoPro, Inkbird, SensorPush, and Ruuvi device advertisements
 - Parses temperature, humidity, battery level, pressure, and voltage
 - Publishes to MQTT with TLS support
+- Web UI on the local network for configuration and per-sensor management
 - Runs as CLI, systemd service, or Docker container
 
 ## Raspberry Pi Setup
@@ -90,7 +91,7 @@ python gateway.py
 ```bash
 # Copy files
 sudo mkdir -p /opt/ble-gateway
-sudo cp gateway.py config.py requirements.txt /opt/ble-gateway/
+sudo cp gateway.py config.py webui.py requirements.txt /opt/ble-gateway/
 sudo python3 -m venv /opt/ble-gateway/venv
 sudo /opt/ble-gateway/venv/bin/pip install -r /opt/ble-gateway/requirements.txt
 
@@ -144,9 +145,44 @@ pip install -r requirements.txt
 docker compose up -d
 ```
 
+## Web UI
+
+The gateway serves a small configuration page on the local network, by default
+at `http://<gateway-ip>:8080`. From it you can:
+
+- Edit MQTT settings (broker, port, credentials, TLS, topic prefix, log level).
+  Changing broker settings restarts the gateway automatically (takes a few
+  seconds); log level and topic prefix apply live.
+- See every recognized sensor: name, brand, MAC, RSSI, last seen, and the
+  latest readings.
+- Enable/disable publishing per sensor and give sensors friendly names
+  (names are for the UI only — MQTT topics stay MAC-based). Disabling a
+  sensor also clears its retained MQTT topics.
+- Choose what happens to newly discovered sensors: publish automatically
+  (default) or ignore until you enable them.
+
+Settings saved in the UI are written to `config.json` next to the app (or the
+path in `CONFIG_FILE`). Precedence: `config.json` > environment variables >
+built-in defaults, so existing env-var-based deployments keep working.
+
+The web server itself is configured via environment variables only (so a bad
+save can't lock you out):
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `WEB_ENABLED` | `true` | Serve the web UI |
+| `WEB_HOST` | `0.0.0.0` | Bind address |
+| `WEB_PORT` | `8080` | Port |
+| `WEB_USERNAME` | `admin` | Basic auth username |
+| `WEB_PASSWORD` | - | Basic auth password; empty disables auth |
+| `CONFIG_FILE` | `config.json` (app dir) | Where UI-saved settings are stored |
+
+The UI is plain HTTP intended for trusted local networks. Set `WEB_PASSWORD`
+if others share your network, or `WEB_ENABLED=false` to turn it off entirely.
+
 ## Configuration
 
-Configuration is done via environment variables:
+Configuration can be done via the web UI (above) or environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -157,8 +193,10 @@ Configuration is done via environment variables:
 | `MQTT_USE_TLS` | `true` | Enable TLS encryption |
 | `MQTT_TOPIC_PREFIX` | `sensors` | MQTT topic prefix |
 | `LOG_LEVEL` | `INFO` | Logging level (DEBUG, INFO, WARNING, ERROR) |
+| `NEW_DEVICES` | `publish` | `publish` new sensors automatically, or `ignore` them until enabled in the UI |
 
-Edit `config.py` to change default values, or set environment variables.
+Values saved from the web UI (stored in `config.json`) override environment
+variables.
 
 ## Usage
 
@@ -174,7 +212,7 @@ python gateway.py
 1. Copy files to `/opt/ble-gateway`:
    ```bash
    sudo mkdir -p /opt/ble-gateway
-   sudo cp gateway.py config.py requirements.txt /opt/ble-gateway/
+   sudo cp gateway.py config.py webui.py requirements.txt /opt/ble-gateway/
    sudo python3 -m venv /opt/ble-gateway/venv
    sudo /opt/ble-gateway/venv/bin/pip install -r /opt/ble-gateway/requirements.txt
    ```
