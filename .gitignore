@@ -12,6 +12,9 @@ ENV/
 # Environment variables
 .env
 
+# Runtime configuration written by the web UI
+config.json
+
 # IDE
 .idea/
 .vscode/
